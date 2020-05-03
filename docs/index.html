@@ -91,10 +91,15 @@
                 <figcaption align="middle">Original</figcaption>
               </td>
               <td align="middle">
+              <img src="milestone-images/blurry.png" width="480px" />
+              <figcaption align="middle">Gaussian Blurred Image</figcaption>
+            </tr>
+            <tr>
+            </td>
+              <td align="middle">
               <img src="milestone-images/diff.png" width="480px" />
               <figcaption align="middle">Ratio of original image gradient to blurred image gradient</figcaption>
             </td>
-
           </td>
           <td align="middle">
           <img src="milestone-images/canny.png" width="480px" />
@@ -129,13 +134,13 @@
             <figcaption>Depth mapping</figcaption>
           </td>
           <td>
-  
+
             <img src="images/rclouds.png" width="480px"/>
             <figcaption>Original Image</figcaption>
           </td>
-          
+
         </tr>
-        
+
         <tr>
           <td>
             3D Ken Burns Effect
@@ -148,17 +153,17 @@
             <video width="480" height="640" controls>
               <source src="images/autozoom.mp4" type="video/mp4">
             Your browser does not support the video tag.
-            </video> 
+            </video>
           </td>
-          
+
         </tr>
         <tr>
           <td>
             Artificial Lens Blur
           </td>
-          
+
           <td>
-            We establish a focus point in the depth map.  Because we only had relative depth measurements for depth, we assumed the image was focused at infinity.  
+            We establish a focus point in the depth map.  Because we only had relative depth measurements for depth, we assumed the image was focused at infinity.
             We then simulated a thin lens effect by picking a point as our point of focus, and estimating the degree of blur using lens equations learned in class.
             This technique is meant for cameras focused at infinity, and is effectively the 'inverse' of the idea of the defocus map - given a depth map, determine blur.
           </td>
@@ -166,10 +171,10 @@
             <img src="images/portrait.png" width="480px"/>
             <figcaption>partially blurred image. We did a binary mask for now, but we are looking into fast methods of using proportional blur.</figcaption>
           </td>
-          
+
         </tr>
-        
-        
+
+
       </table>
     </div>
     <div align="middle">
@@ -179,9 +184,9 @@
             <img src="" width="400px"/>
             <figcaption></figcaption>
           </td>
-          
+
         </tr>
-        
+
       </table>
     </div>
     <h3>Next Steps</h3>
