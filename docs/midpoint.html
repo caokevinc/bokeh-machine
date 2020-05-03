@@ -114,6 +114,75 @@
         in the foreground have original blurs less than those in the background,
         and is a hopeful sign that we are on the right track.
       </p>
+
+
+    <h3>Out of the box depth estimation and effects </h3>
+    <p> We also used out of the box depth estimation to test out some cool effects.  We listed two we implemented below </p>
+    <div align="middle">
+      <table style="width=100%">
+        <tr>
+          <td>
+            Original Image
+          </td>
+          <td>
+            <img src="images/depth.jpg" width="400px"/>
+            <figcaption>Depth mapping</figcaption>
+          </td>
+          <td>
+            <img src="images/clouds.jpg" width="400px"/>
+            <figcaption>Original Image</figcaption>
+          </td>
+          
+        </tr>
+        
+        <tr>
+          <td>
+            3D Ken Burns Effect
+          </td>
+          <td>
+            Elements which are closer to the camera are zoomed in more than those farther away, simulating the camera moving closer to the image.
+            In addition, blown up closer versions of the image are laid over the images farther back.  We mostly used an out of the box implementation for this part.
+          </td>
+          <td>
+            <video width="400" height="320" controls>
+              <source src="images/autozoom.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+            </video> 
+          </td>
+          
+        </tr>
+        <tr>
+          <td>
+            Artificial Lens Blur
+          </td>
+          
+          <td>
+            We establish a focus point in the depth map.  Because we only had relative depth measurements for depth, we assumed the image was focused at infinity.  
+            We then simulated a thin lens effect by picking a point as our point of focus, and estimating the degree of blur using lens equations learned in class.
+            This technique is meant for cameras focused at infinity, and is effectively the 'inverse' of the idea of the defocus map - given a depth map, determine blur.
+          </td>
+          <td>
+            <img src="images/portrait.png" width="400px"/>
+            <figcaption>blurred image. We did a binary mask for now, but we are looking into fast methods of using proportional blur.</figcaption>
+          </td>
+          
+        </tr>
+        
+        
+      </table>
+    </div>
+    <div align="middle">
+      <table style="width=100%">
+        <tr>
+          <td>
+            <img src="" width="400px"/>
+            <figcaption></figcaption>
+          </td>
+          
+        </tr>
+        
+      </table>
+    </div>
     <h3>Next Steps</h3>
     <p>
         Our next steps are to follow through with the Defocus map estimation method
