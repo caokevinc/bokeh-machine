@@ -9,110 +9,195 @@
       padding-left: 100px;
     }
   </style>
-<title>Kevin Cao, Aniruddha Nrusimha and Angela Dong |  CS 184</title>
+<title>Kevin Cao  |  CS 184</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
 </head>
 <body>
 <br />
-<h1 align="middle">Final Project Proposal - Bokeh Machine - Depth of Field Synthesizer</h1>
+<h1 align="middle">Final Project Milestone - Bokeh Machine - Depth of Field Synthesizer</h1>
     <h2 align="middle">Kevin Cao, Angela Dong, Aniruddha Nrusimha </h2>
 
     <div class="padded">
         <p>
-            We want to simulate depth of field effects in photos that do not have shallow depth of field. We will do this
-            by producing a depth map using the already existing depth of field in the image via a defocus map. Given a
-            depth of field and pixel information we can then simulate a thin lens with variable aperture and focal plane.
+            We worked on three approaches to implmenting a depth map, each from
+            a different paper. Our experiments have been giving us more intuition
+            about the depth map problem, and should hopefully allow us to continue
+            more productively.
         </p>
-      <div align="center">
-            <table style="width=100%">
-                <tr valign="top">
-                    <td align="middle">
-                    <img src="images/grad.png" width="480px" />
-                    <figcaption align="middle">Bokeh refers to the blur in the out of focus parts created by the aperture of the lens.</figcaption>
 
-                </tr>
+    <h3>Enhanced Image Gradients</h2>
+        </p>
+          We first tried a method from
+          <a href="https://www.sciencedirect.com/science/article/pii/S1877050915031968"> this paper</a>
+          that tries to find a depth map with gradients close to the original image gradient.
+          The assumption is that the gradients in the depth map should match up
+          to the gradients in the image. The paper suggests and error function
+          relating the image gradient to the depth map gradients and provides a
+          closed form solution for the depth map.
+        </p>
+        <div align="middle">
+            <table style="width=100%">
+              <tr valign="top">
+                  <td align="left">
+                  <img src="milestone-images/enhancedalgo.png" width="850" />
+                  <figcaption align="middle">Algorithm for constructing Depth Map from Bala et. al</figcaption>
+                </td>
 
             </table>
         </div>
-    <h3>Problem Statement</h2>
-            Bokeh is a often a desired effect in portrait photography. The out of focus blur of the background
-            gives the subject more "pop" and presence. The shallow depth of field necessary
-            to produce this effect is created by large sensors and large apertures found
-            in professional cameras. However, smartphone cameras have small sensors which prevent them from producing the
-            aesthetic depth of field effects that big sensor DSLRs can produce. However, modern
-            smartphones often have “portrait mode”, which simulates this shallow depth of field.
-            We will attempt to produce bokeh by first producing a depth map using a “defocus map”, applying a gaussian
-            filter on the image and using the image gradient as a stand in for depth. Then
-            using our depth map we will apply a thin lens simulation to render the final
-            bokeh laden photo.
-
-          </p>
-
           <div align="center">
               <table style="width=100%">
-                  <tr valign="top">
-                      <td align="middle">
-                      <img src="images/bokeh1.png" width="480px" />
-                      <figcaption align="middle">Deep vs Shallow Depth of Field. Photo taken from Resource 2.</figcaption>
-                  </tr>
+                <tr valign="top">
+                    <td align="middle">
+                    <img src="milestone-images/yq.png" width="480px" />
+                    <figcaption align="middle">Original</figcaption>
+                  </td>
+                    <td align="middle">
+                    <img src="milestone-images/enhanced.png" width="480px" />
+                    <figcaption align="middle">Depth Map</figcaption>
+                  </td>
               </table>
           </div>
-        <h3> Goals </h3>
-      <p>
-        Use Depth Estimation from single/multiple images to generate synthetic depth of field effects, like bokeh effect and 3d ken burns effect
-      </p>
-
-          <ul>
-            <li>
-              Segmentation
-            </li>
-            <li>
-              Effects
-            </li>
-            <li>
-               Bokeh Effect - enhance the blur of the background to make the foreground pop more
-            </li>
-            <li>
-              Portrait Mode - artificially decrease the focal length of the image to change what is the background
-            </li>
-            <li>
-              3D ken burns - ‘enhanced zoom’ where parallax effects are used to make the zoom look like the camera is moving towards the image instead of zooming in.
-              http://content.sniklaus.com/kenburns/video.mp4
-            </li>
-        </ul>
         <p>
-          Stretch Goals
-      </p>
-      <ul>
-        <li>OpenGL acceleration for depth mapping
-        <li> Compare depth map based approaches to Inverse Rendering Based Approaches; foreground segmentation
-        <li> Use focus stacking to create depth map
-      </ul>
-      <p>Ouput/Deliverables</p>
-      <ul>
-         <li> Produce images with bokeh from images without shallow depth of field
-           <li> Produce a 3D depth map of a photo
-      </ul>
+          However we found that this method gave us a weak, and frankly horrifying
+          depth map. This, at least in its current implementation, is a dead end for us.
+        </p>
 
-      <h3>Quality</h3>
+
+      <h3>Defocus map estimation</h2>
+        <div align="center">
+            <table style="width=100%">
+              <tr valign="top">
+                  <td align="middle">
+                  <img src="milestone-images/edgeblur.png" width="800px" />
+                  <figcaption align="middle">Overview of blur estimation approach, taken from Zhuo et. al</figcaption>
+                </td>
+            </table>
+        </div>
       <p>
-        We will collect a photoset of photos taken of the same scene with varying apertures on a real 35mm camera,
-        and compare it visually to photos produced with our depth of field synthesizer.
-        We will measure render time taken for each of the effects, and time / visual quality trade offs in the image.
+          In this approach, we blur the image and take the ratio of the gradients
+          of the original image with the gradients of the blurred image. This ratio
+          gives us an estimation of the standard deviation of the original blur of a
+          region of the image, as we model out of focus areas as a gaussian blur.
+          This effectively gives us a "defocus map" which we can roughly equate to a
+          depth map.
+      </p>
+      <div align="center">
+          <table style="width=100%">
+            <tr valign="top">
+                <td align="middle">
+                <img src="milestone-images/yq.png" width="480px" />
+                <figcaption align="middle">Original</figcaption>
+              </td>
+              <td align="middle">
+              <img src="milestone-images/diff.png" width="480px" />
+              <figcaption align="middle">Ratio of original image gradient to blurred image gradient</figcaption>
+            </td>
+
+          </td>
+          <td align="middle">
+          <img src="milestone-images/canny.png" width="480px" />
+          <figcaption align="middle">Canny Edge Detector Edge Map</figcaption>
+        </td>
+        </tr>
+        <tr>
+            <td align="middle">
+            <img src="milestone-images/sparse.png" width="480px" />
+            <figcaption align="middle">Sparse Defocus Map</figcaption>
+          </td>
+          </table>
+      </div>
+      <p>
+        We can see in the sparse defocus map that edges in the foreground are lighter than
+        those in the background. In this visualization, this means that the edges
+        in the foreground have original blurs less than those in the background,
+        and is a hopeful sign that we are on the right track.
+      </p>
+
+
+    <h3>Out of the box depth estimation and effects </h3>
+    <p> We also used out of the box depth estimation to test out some cool effects.  We listed two we implemented below </p>
+    <div align="middle">
+      <table style="width=100%">
+        <tr>
+          <td>
+            Original Image
+          </td>
+          <td>
+            <img src="images/depth.jpg" width="400px"/>
+            <figcaption>Depth mapping</figcaption>
+          </td>
+          <td>
+            <img src="images/clouds.jpg" width="400px"/>
+            <figcaption>Original Image</figcaption>
+          </td>
+          
+        </tr>
+        
+        <tr>
+          <td>
+            3D Ken Burns Effect
+          </td>
+          <td>
+            Elements which are closer to the camera are zoomed in more than those farther away, simulating the camera moving closer to the image.
+            In addition, blown up closer versions of the image are laid over the images farther back.  We mostly used an out of the box implementation for this part.
+          </td>
+          <td>
+            <video width="400" height="320" controls>
+              <source src="images/autozoom.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+            </video> 
+          </td>
+          
+        </tr>
+        <tr>
+          <td>
+            Artificial Lens Blur
+          </td>
+          
+          <td>
+            We establish a focus point in the depth map.  Because we only had relative depth measurements for depth, we assumed the image was focused at infinity.  
+            We then simulated a thin lens effect by picking a point as our point of focus, and estimating the degree of blur using lens equations learned in class.
+            This technique is meant for cameras focused at infinity, and is effectively the 'inverse' of the idea of the defocus map - given a depth map, determine blur.
+          </td>
+          <td>
+            <img src="images/portrait.png" width="400px"/>
+            <figcaption>blurred image. We did a binary mask for now, but we are looking into fast methods of using proportional blur.</figcaption>
+          </td>
+          
+        </tr>
+        
+        
+      </table>
+    </div>
+    <div align="middle">
+      <table style="width=100%">
+        <tr>
+          <td>
+            <img src="" width="400px"/>
+            <figcaption></figcaption>
+          </td>
+          
+        </tr>
+        
+      </table>
+    </div>
+    <h3>Next Steps</h3>
+    <p>
+        Our next steps are to follow through with the Defocus map estimation method
+        and finish interpolating from the sparse defocus map we have to a full
+        defocus map using laplacian matting. We will also have to implement the thin
+        lens model that we can use on the depth map once we have our completed depth map.
     </p>
-    <h3>Schedule</h3>
-    <ul>
-      <li>2nd Week - Finish creating depth map and compute brokeh effect
-      <li>3rd Week - Apply portrait and ken burns effect.  Work on stretch goals
-      <li>4th Week - Finish write up
-    </ul>
+
 
 
     <h3> Resources </h3>
     <ol>
       <li>http://graphics.stanford.edu/papers/portrait/wadhwa-portrait-sig18.pdf - Google portrait mode paper
-      <li>https://pdfs.semanticscholar.org/0cda/570098837cc1accb7b871611b88c48b8f38c.pdf - Defocus Map
+      <li>https://www.sciencedirect.com/science/article/pii/S1877050915031968 - Enhanced Image Gradients
+      <li>https://www.comp.nus.edu.sg/~tsim/documents/defocusEstimation-published.pdf - Defocus map estimation from a single image
       <li>https://arxiv.org/pdf/1909.05483v1.pdf - 3d ken burns
       <li>https://arxiv.org/pdf/1810.08100.pdf - depth of field from single image
     </ol>
