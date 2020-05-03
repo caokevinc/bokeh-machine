@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+    div.padded {
+      padding-top: 0px;
+      padding-right: 100px;
+      padding-bottom: 0.25in;
+      padding-left: 100px;
+    }
+  </style>
+<title>Kevin Cao  |  CS 184</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+</head>
+<body>
+<br />
+<h1 align="middle">Final Project Proposal - Bokeh Machine - Depth of Field Synthesizer</h1>
+    <h2 align="middle">Kevin Cao, Angela Dong, Aniruddha Nrusimha </h2>
+
+    <div class="padded">
+        <p>
+            We want to simulate depth of field effects in photos that do not have shallow depth of field. We will do this
+            by producing a depth map using the already existing depth of field in the image via a defocus map. Given a
+            depth of field and pixel information we can then simulate a thin lens with variable aperture and focal plane.
+        </p>
+      <div align="center">
+            <table style="width=100%">
+                <tr valign="top">
+                    <td align="middle">
+                    <img src="images/grad.png" width="480px" />
+                    <figcaption align="middle">Bokeh refers to the blur in the out of focus parts created by the aperture of the lens.</figcaption>
+
+                </tr>
+
+            </table>
+        </div>
+    <h3>Problem Statement</h2>
+            Bokeh is a often a desired effect in portrait photography. The out of focus blur of the background
+            gives the subject more "pop" and presence. The shallow depth of field necessary
+            to produce this effect is created by large sensors and large apertures found
+            in professional cameras. However, smartphone cameras have small sensors which prevent them from producing the
+            aesthetic depth of field effects that big sensor DSLRs can produce. However, modern
+            smartphones often have “portrait mode”, which simulates this shallow depth of field.
+            We will attempt to produce bokeh by first producing a depth map using a “defocus map”, applying a gaussian
+            filter on the image and using the image gradient as a stand in for depth. Then
+            using our depth map we will apply a thin lens simulation to render the final
+            bokeh laden photo.
+
+          </p>
+
+          <div align="center">
+              <table style="width=100%">
+                  <tr valign="top">
+                      <td align="middle">
+                      <img src="images/bokeh1.png" width="480px" />
+                      <figcaption align="middle">Deep vs Shallow Depth of Field. Photo taken from Resource 2.</figcaption>
+                  </tr>
+              </table>
+          </div>
+        <h3> Goals </h3>
+      <p>
+        Use Depth Estimation from single/multiple images to generate synthetic depth of field effects, like bokeh effect and 3d ken burns effect
+      </p>
+
+          <ul>
+            <li>
+              Segmentation
+            </li>
+            <li>
+              Effects
+            </li>
+            <li>
+               Bokeh Effect - enhance the blur of the background to make the foreground pop more
+            </li>
+            <li>
+              Portrait Mode - artificially decrease the focal length of the image to change what is the background
+            </li>
+            <li>
+              3D ken burns - ‘enhanced zoom’ where parallax effects are used to make the zoom look like the camera is moving towards the image instead of zooming in.
+              http://content.sniklaus.com/kenburns/video.mp4
+            </li>
+        </ul>
+        <p>
+          Stretch Goals
+      </p>
+      <ul>
+        <li>OpenGL acceleration for depth mapping
+        <li> Compare depth map based approaches to Inverse Rendering Based Approaches; foreground segmentation
+        <li> Use focus stacking to create depth map
+      </ul>
+      <p>Ouput/Deliverables</p>
+      <ul>
+         <li> Produce images with bokeh from images without shallow depth of field
+           <li> Produce a 3D depth map of a photo
+      </ul>
+
+      <h3>Quality</h3>
+      <p>
+        We will collect a photoset of photos taken of the same scene with varying apertures on a real 35mm camera,
+        and compare it visually to photos produced with our depth of field synthesizer.
+        We will measure render time taken for each of the effects, and time / visual quality trade offs in the image.
+    </p>
+    <h3>Schedule</h3>
+    <ul>
+      <li>2nd Week - Finish creating depth map and compute brokeh effect
+      <li>3rd Week - Apply portrait and ken burns effect.  Work on stretch goals
+      <li>4th Week - Finish write up
+    </ul>
+
+
+    <h3> Resources </h3>
+    <ol>
+      <li>http://graphics.stanford.edu/papers/portrait/wadhwa-portrait-sig18.pdf - Google portrait mode paper
+      <li>https://pdfs.semanticscholar.org/0cda/570098837cc1accb7b871611b88c48b8f38c.pdf - Defocus Map
+      <li>https://arxiv.org/pdf/1909.05483v1.pdf - 3d ken burns
+      <li>https://arxiv.org/pdf/1810.08100.pdf - depth of field from single image
+    </ol>
+
+
+
+
+
+</div>
+</body>
+</html>
