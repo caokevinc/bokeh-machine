@@ -2,22 +2,68 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <style>
-    div.padded {
-      padding-top: 0px;
-      padding-right: 100px;
-      padding-bottom: 0.25in;
-      padding-left: 100px;
-    }
-  </style>
-<title>Kevin Cao  |  CS 184</title>
+  body {
+    padding: 100px;
+    width: 800px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Lato', sans-serif;
+    color: #121212;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Lato', sans-serif;
+    text-align: left;
+  }
+  h1 {
+    color: #002f4f;
+    font-size: 30px;
+    text-align: center;
+    line-height: 1;
+  }
+  h2 {
+    color: #2a5e82;
+    font-size: 24px;
+    margin-top: 40px;
+  }
+  h3 {
+    color: #95b4c9;
+    font-size: 20px;
+    margin-top: 30px;
+  }
+  h4 {
+    color: #3b3b3b;
+    font-size: 16px;
+    font-weight: 400;
+    margin-top: 30px;
+  }
+  figcaption {
+    color: #888888;
+    font-size: 12px;
+    font-style: italic;
+    margin-top: 10px;
+  }
+  img {
+    display: block;
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+</style>
+<title>CS 184 Final Project</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+<link href="https://fonts.googleapis.com/css?family=Lato:300,300i,400,400i,700,700i&display=swap" rel="stylesheet">
 </head>
+
 <body>
 <br />
-<h1 align="middle">Final Project Milestone - Bokeh Machine - Depth of Field Synthesizer</h1>
-    <h2 align="middle">Kevin Cao, Angela Dong, Aniruddha Nrusimha </h2>
+<h1 align="middle">CS 184 Final Project Writeup</h1>
+<h1>Bokeh Machine - Depth of Field Synthesizer</h1>
+<h1 align="middle">Kevin Cao, Angela Dong, Aniruddha Nrusimha </h1>
 
+  <h2>Abstract</h2>
     <div class="padded">
         <p>
             We worked on three approaches to implmenting a depth map, each from
@@ -26,6 +72,7 @@
             more productively.
         </p>
 
+  <h2>Technical Approach</h2>
     <h3>Enhanced Image Gradients</h2>
         </p>
           We first tried a method from
@@ -39,8 +86,8 @@
         <div align="middle">
             <table style="width=100%">
               <tr valign="top">
-                  <td align="left">
-                  <img src="milestone-images/enhancedalgo.png" width="850" />
+                  <td align="middle">
+                  <img src="milestone-images/enhancedalgo.png" width="800px" />
                   <figcaption align="middle">Algorithm for constructing Depth Map from Bala et. al</figcaption>
                 </td>
 
@@ -50,11 +97,11 @@
               <table style="width=100%">
                 <tr valign="top">
                     <td align="middle">
-                    <img src="milestone-images/yq.png" width="480px" />
+                    <img src="milestone-images/yq.png" width="400px" />
                     <figcaption align="middle">Original</figcaption>
                   </td>
                     <td align="middle">
-                    <img src="milestone-images/enhanced.png" width="480px" />
+                    <img src="milestone-images/enhanced.png" width="400px" />
                     <figcaption align="middle">Depth Map</figcaption>
                   </td>
               </table>
@@ -159,6 +206,7 @@
       </table>
     </div>
 
+  <h2>Results</h2>
     <h3>Out of the box depth estimation and effects </h3>
     <p> We also used out of the box depth estimation to test out some cool effects.  We listed two we implemented below </p>
     <div align="middle">
@@ -217,7 +265,7 @@
     </div>
 
   
-    <video width="1280" height="720" controls>
+    <video width="800px" height="600px" controls>
       <source src="images/zoom_1.mp4" type="video/mp4">
     Your browser does not support the video tag.
     </video> 
@@ -240,7 +288,7 @@
 
 
 
-    <h3> Resources </h3>
+    <h2>References</h2>
     <ol>
       <li>http://graphics.stanford.edu/papers/portrait/wadhwa-portrait-sig18.pdf - Google portrait mode paper
       <li>https://www.sciencedirect.com/science/article/pii/S1877050915031968 - Enhanced Image Gradients
@@ -249,6 +297,10 @@
       <li>https://arxiv.org/pdf/1810.08100.pdf - depth of field from single image
     </ol>
 
+    <h2>Contributions</h2>
+    <h3>Kevin</h3>
+    <h3>Angela</h3>
+    <h3>Ani</h3>
 
 
 
