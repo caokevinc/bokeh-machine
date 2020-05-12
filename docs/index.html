@@ -39,12 +39,24 @@
     font-weight: 400;
     margin-top: 30px;
   }
+  pre {
+    padding: 0.75em 1em;
+    background: #f4f4f4;
+    border: solid 1px #eeeeee;
+    margin-bottom: 20px;
+  }
+  code {
+    font-size: 85%;
+    font-family: Monaco, monospace;
+    color: #666666;
+  }
   figcaption {
     color: #888888;
     font-size: 12px;
     font-style: italic;
     margin-top: 10px;
     margin-bottom: 20px;
+    text-align: center;
   }
   img {
     display: block;
@@ -59,9 +71,6 @@
     margin-top: 10px;
     margin-bottom: 20px;
   }
-  figcaption {
-    text-align: center;
-  }
   #bird-video {
     width: 400px;
     margin-top: 10px;
@@ -74,283 +83,268 @@
 </head>
 
 <body>
-<br />
-<h1 align="middle">CS 184 Final Project Writeup</h1>
+<h1>CS 184 Final Project Writeup</h1>
 <h1>Bokeh Machine - Depth of Field Synthesizer</h1>
-<h1 align="middle">Kevin Cao, Angela Dong, Aniruddha Nrusimha </h1>
+<h1>Kevin Cao, Angela Dong, Aniruddha Nrusimha </h1>
 
-  <h2>Abstract</h2>
-    <div class="padded">
-        <p>
-            We worked on three approaches to implmenting a depth map, each from
-            a different paper. Our experiments have been giving us more intuition
-            about the depth map problem, and should hopefully allow us to continue
-            more productively.
-        </p>
+<h2>Abstract</h2>
+<pre><code>testing code
+sldkfj
+testing code</code></pre>
+<p>
+  We worked on three approaches to implmenting a depth map, each from
+  a different paper. Our experiments have been giving us more intuition
+  about the depth map problem, and should hopefully allow us to continue
+  more productively.
+</p>
 
-  <h2>Technical Approach</h2>
-    <h3>Enhanced Image Gradients</h2>
-        </p>
-          We first tried a method from
-          <a href="https://www.sciencedirect.com/science/article/pii/S1877050915031968"> this paper</a>
-          that tries to find a depth map with gradients close to the original image gradient.
-          The assumption is that the gradients in the depth map should match up
-          to the gradients in the image. The paper suggests and error function
-          relating the image gradient to the depth map gradients and provides a
-          closed form solution for the depth map.
-        </p>
-        <div align="middle">
-            <table style="width=100%">
-              <tr valign="top">
-                  <td align="middle">
-                  <img src="milestone-images/enhancedalgo.png" width="800px" />
-                  <figcaption align="middle">Algorithm for constructing Depth Map from Bala et. al</figcaption>
-                </td>
-
-            </table>
-        </div>
-          <div align="center">
-              <table style="width=100%">
-                <tr valign="top">
-                    <td align="middle">
-                    <img src="milestone-images/yq.png" width="400px" />
-                    <figcaption align="middle">Original</figcaption>
-                  </td>
-                    <td align="middle">
-                    <img src="milestone-images/enhanced.png" width="400px" />
-                    <figcaption align="middle">Depth Map</figcaption>
-                  </td>
-              </table>
-          </div>
-        <p>
-          However we found that this method gave us a weak, and frankly horrifying
-          depth map. This, at least in its current implementation, is a dead end for us.
-        </p>
-
-
-      <h3>Defocus map estimation</h2>
-        <div align="center">
-            <table style="width=100%">
-              <tr valign="top">
-                  <td align="middle">
-                  <img src="milestone-images/edgeblur.png" width="800px" />
-                  <figcaption align="middle">Overview of blur estimation approach, taken from Zhuo et. al</figcaption>
-                </td>
-            </table>
-        </div>
-      <p>
-          In this approach, we blur the image and take the ratio of the gradients
-          of the original image with the gradients of the blurred image. This ratio
-          gives us an estimation of the standard deviation of the original blur of a
-          region of the image, as we model out of focus areas as a gaussian blur.
-          This effectively gives us a "defocus map" which we can roughly equate to a
-          depth map.
-      </p>
-      <div align="center">
-          <table style="width=100%">
-            <tr valign="top">
-                <td align="middle">
-                <img src="milestone-images/yq.png" width="400px" />
-                <figcaption align="middle">Original</figcaption>
-              </td>
-              <td align="middle">
-              <img src="milestone-images/blurry.png" width="400px" />
-              <figcaption align="middle">Gaussian Blurred Image</figcaption>
-            </tr>
-            <tr>
-            </td>
-              <td align="middle">
-              <img src="milestone-images/diff.png" width="400px" />
-              <figcaption align="middle">Ratio of original image gradient to blurred image gradient</figcaption>
-            </td>
-          </td>
-          <td align="middle">
-          <img src="milestone-images/canny.png" width="400px" />
-          <figcaption align="middle">Canny Edge Detector Edge Map</figcaption>
+<h2>Technical Approach</h2>
+<h3>Enhanced Image Gradients</h3>
+<p>
+  We first tried a method from
+  <a href="https://www.sciencedirect.com/science/article/pii/S1877050915031968"> this paper</a>
+  that tries to find a depth map with gradients close to the original image gradient.
+  The assumption is that the gradients in the depth map should match up
+  to the gradients in the image. The paper suggests and error function
+  relating the image gradient to the depth map gradients and provides a
+  closed form solution for the depth map.
+</p>
+<div>
+    <table>
+      <tr valign="top">
+        <td align="middle">
+          <img src="milestone-images/enhancedalgo.png" width="800px" />
+          <figcaption align="middle">Algorithm for constructing Depth Map from Bala et. al</figcaption>
         </td>
-        </tr>
-        <tr>
-            <td align="middle">
-            <img src="milestone-images/sparse.png" width="400px" />
-            <figcaption align="middle">Sparse Defocus Map</figcaption>
-          </td>
-          </table>
-      </div>
-      <p>
-        We can see in the sparse defocus map that edges in the foreground are lighter than
-        those in the background. In this visualization, this means that the edges
-        in the foreground have original blurs less than those in the background,
-        and is a hopeful sign that we are on the right track.
-      </p>
-      <p> INSERT MORE DETAIL ON FILLING IN SPARSE MAP </p>
-      <p> Using the constructed depth map, we get strong results on a variety of images.  As reference, lighter portions of the image are closer to the camera </p>
-      <p> These results also allow us to construct visual effects on our results </p>
-    <div align="middle">
-      <table>
-        <tr>
-          <td>
-            <img src="images/input.png" width="250px"/>
-            <figcaption>Original image</figcaption>
-          </td>
-          <td>
-            <img src="images/bird_depth.png" width="250px"/>
-            <figcaption>Depth we generated</figcaption>
-          </td>
-          <td>
-            <img src="images/binary_blur.png" width="250px"/>
-            <figcaption>Foreground - background extraction</figcaption>
-          </td>
-        </tr>
-      </table>
-          
-     <table>
-        We can use these depth extractions for cool effects, which we will discuss later.
-        <tr>
-          <td>
-            <img src="images/super_blur.png" width="400px"/>
-            <figcaption>Enhancing bokeh effects for the picture</figcaption>
-          </td>
-          <td>
-            <video id="bird-video" controls>
-              <source src="images/bird.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-            </video> 
-            <figcaption>Ken Burns effect</figcaption>
-          </td>
-          
-        </tr>
-        
-        
-        
-      </table>
-    </div>
-    <p> We tested our depth map estimation on a variety of images, and got generally good results.  For a tough scenario, We took some pictures of one of flowers, which are highly detailed and complex depth maps. </p>
+    </table>
+    <table>
+      <tr valign="top">
+        <td align="middle">
+          <img src="milestone-images/yq.png" width="400px" />
+          <figcaption align="middle">Original</figcaption>
+        </td>
+        <td align="middle">
+          <img src="milestone-images/enhanced.png" width="400px" />
+          <figcaption align="middle">Depth Map</figcaption>
+        </td>
+      </tr>
+    </table>
+</div>
+<p>
+  However we found that this method gave us a weak, and frankly horrifying
+  depth map. This, at least in its current implementation, is a dead end for us.
+</p>
+<h3>Defocus map estimation</h3>
+<div>
+    <table>
+      <tr valign="top">
+        <td align="middle">
+          <img src="milestone-images/edgeblur.png" width="800px" />
+          <figcaption align="middle">Overview of blur estimation approach, taken from Zhuo et. al</figcaption>
+        </td>
+      </tr>
+    </table>
+</div>
+<p>
+    In this approach, we blur the image and take the ratio of the gradients
+    of the original image with the gradients of the blurred image. This ratio
+    gives us an estimation of the standard deviation of the original blur of a
+    region of the image, as we model out of focus areas as a gaussian blur.
+    This effectively gives us a "defocus map" which we can roughly equate to a
+    depth map.
+</p>
+<div>
+  <table>
+    <tr valign="top">
+      <td align="middle">
+        <img src="milestone-images/yq.png" width="400px" />
+        <figcaption align="middle">Original</figcaption>
+      </td>
+      <td align="middle">
+        <img src="milestone-images/blurry.png" width="400px" />
+        <figcaption align="middle">Gaussian Blurred Image</figcaption>
+      </td>
+    <tr>
+      <td align="middle">
+        <img src="milestone-images/diff.png" width="400px" />
+        <figcaption align="middle">Ratio of original image gradient to blurred image gradient</figcaption>
+      </td>
+      <td align="middle">
+        <img src="milestone-images/canny.png" width="400px" />
+        <figcaption align="middle">Canny Edge Detector Edge Map</figcaption>
+      </td>
+    </tr>
+    <tr>
+      <td align="middle">
+        <img src="milestone-images/sparse.png" width="400px" />
+        <figcaption align="middle">Sparse Defocus Map</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<p>
+  We can see in the sparse defocus map that edges in the foreground are lighter than
+  those in the background. In this visualization, this means that the edges
+  in the foreground have original blurs less than those in the background,
+  and is a hopeful sign that we are on the right track.
+</p>
+<p> INSERT MORE DETAIL ON FILLING IN SPARSE MAP </p>
+<p> Using the constructed depth map, we get strong results on a variety of images.  As reference, lighter portions of the image are closer to the camera </p>
+<p> These results also allow us to construct visual effects on our results </p>
+<div>
+  <table>
+    <tr>
+      <td>
+        <img src="images/input.png" width="250px"/>
+        <figcaption>Original image</figcaption>
+      </td>
+      <td>
+        <img src="images/bird_depth.png" width="250px"/>
+        <figcaption>Depth we generated</figcaption>
+      </td>
+      <td>
+        <img src="images/binary_blur.png" width="250px"/>
+        <figcaption>Foreground - background extraction</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<p>We can use these depth extractions for cool effects, which we will discuss later.</p>
+<div>
+  <table>
+    <tr>
+      <td>
+        <img src="images/super_blur.png" width="400px"/>
+        <figcaption>Enhancing bokeh effects for the picture</figcaption>
+      </td>
+      <td>
+        <video id="bird-video" controls>
+          <source src="images/bird.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video> 
+        <figcaption>Ken Burns effect</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<p>We tested our depth map estimation on a variety of images, and got generally good results.  For a tough scenario, We took some pictures of one of flowers, which are highly detailed and complex depth maps. </p>
+<div>
+  <table>
+    <tr>
+      <td>
+        <img src="images/examples/photo1.jpeg" width="400px"/>
+        <figcaption>First picture of flowers</figcaption>
+      </td>
+      <td>
+        <img src="images/examples/photo1d.png" width="400px"/>
+        <figcaption>Depth picture</figcaption>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img src="images/examples/photo2.jpeg" width="400px"/>
+        <figcaption>Second pictures of flowers</figcaption>
+      </td>
+      <td>
+        <img src="images/examples/photo2d.png" width="400px"/>
+        <figcaption>Depth picture</figcaption>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img src="images/examples/photo3.jpeg" width="400px"/>
+        <figcaption>Third picture of flowers</figcaption>
+      </td>
+      <td>
+        <img src="images/examples/photo3d.png" width="400px"/>
+        <figcaption>Depth picture</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
 
-    <div align="center">
-      <table style="width=100%">
-        <tr>
-          <td>
-            <img src="images/examples/photo1.jpeg" width="400px"/>
-            <figcaption>First picture of flowers</figcaption>
-          </td>
-          <td>
-            <img src="images/examples/photo1d.png" width="400px"/>
-            <figcaption>Depth picture</figcaption>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <img src="images/examples/photo2.jpeg" width="400px"/>
-            <figcaption>Second pictures of flowers</figcaption>
-          </td>
-          <td>
-            <img src="images/examples/photo2d.png" width="400px"/>
-            <figcaption>Depth picture</figcaption>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <img src="images/examples/photo3.jpeg" width="400px"/>
-            <figcaption>Third picture of flowers</figcaption>
-          </td>
-          <td>
-            <img src="images/examples/photo3d.png" width="400px"/>
-            <figcaption>Depth picture</figcaption>
-          </td>
-        </tr>
-      </table>
-    </div>
+<h2>Results</h2>
+<h3>Out of the box depth estimation and effects </h3>
+<p> We also used out of the box depth estimation to test out some cool effects.  We listed two we implemented below </p>
+<div>
+  <table>
+    <tr>
+      <td>
+        <img src="images/rclouds.png" width="400px"/>
+        <figcaption>Original Image</figcaption>
+      </td>
+      <td>
+        <img src="images/depth.jpg" width="400px"/>
+        <figcaption>Depth mapping</figcaption>
+      </td>
+    </tr>
+  </table>
+  <table>
+    <tr>
+      <td>
+        3D Ken Burns Effect
+      </td>
+      <td>
+        Elements which are closer to the camera are zoomed in more than those farther away, simulating the camera moving closer to the image.
+        In addition, blown up closer versions of the image are laid over the images farther back.  We mostly used an out of the box implementation for this part.
+      </td>
+      <td>
+        <video width="400px" controls>
+          <source src="images/autozoom.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Artificial Lens Blur
+      </td>
+      <td>
+        We establish a focus point in the depth map.  Because we only had relative depth measurements for depth, we assumed the image was focused at infinity.
+        We then simulated a thin lens effect by picking a point as our point of focus, and estimating the degree of blur using lens equations learned in class.
+        This technique is meant for cameras focused at infinity, and is effectively the 'inverse' of the idea of the defocus map - given a depth map, determine blur.
+      </td>
+      <td>
+        <img src="images/portrait.png" width="400px"/>
+        <figcaption>partially blurred image. We did a binary mask for now, but we are looking into fast methods of using proportional blur.</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<video width="800px" height="600px" controls>
+  <source src="images/zoom_1.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video> 
+<p>We then tried to these techniques with our own depth estimation</p>
+<video width="800px" height="600px" controls>
+  <source src="images/our_depth.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video> 
+<p>This is me going over the results we got so far in a more approachable format.</p>
+<h3>Next Steps</h3>
+<p>
+    Our next steps are to follow through with the Defocus map estimation method
+    and finish interpolating from the sparse defocus map we have to a full
+    defocus map using laplacian matting. We will also have to implement the thin
+    lens model that we can use on the depth map once we have our completed depth map.
+</p>
 
-  <h2>Results</h2>
-    <h3>Out of the box depth estimation and effects </h3>
-    <p> We also used out of the box depth estimation to test out some cool effects.  We listed two we implemented below </p>
-    <div align="middle">
-      <table style="width=100%">
-        <tr>
-          <td>
-            <img src="images/rclouds.png" width="400px"/>
-            <figcaption>Original Image</figcaption>
-          </td>
-          <td>
-            <img src="images/depth.jpg" width="400px"/>
-            <figcaption>Depth mapping</figcaption>
-          </td>
-        </tr>
-      </table>
-      <table>
-        <tr>
-          <td>
-            3D Ken Burns Effect
-          </td>
-          <td>
-            Elements which are closer to the camera are zoomed in more than those farther away, simulating the camera moving closer to the image.
-            In addition, blown up closer versions of the image are laid over the images farther back.  We mostly used an out of the box implementation for this part.
-          </td>
-          <td>
-            <video width="400px" controls>
-              <source src="images/autozoom.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-            </video>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            Artificial Lens Blur
-          </td>
-          <td>
-            We establish a focus point in the depth map.  Because we only had relative depth measurements for depth, we assumed the image was focused at infinity.
-            We then simulated a thin lens effect by picking a point as our point of focus, and estimating the degree of blur using lens equations learned in class.
-            This technique is meant for cameras focused at infinity, and is effectively the 'inverse' of the idea of the defocus map - given a depth map, determine blur.
-          </td>
-          <td>
-            <img src="images/portrait.png" width="400px"/>
-            <figcaption>partially blurred image. We did a binary mask for now, but we are looking into fast methods of using proportional blur.</figcaption>
-          </td>
-        </tr>
-      </table>
-    </div>
+<h2>References</h2>
+<ol>
+  <li>http://graphics.stanford.edu/papers/portrait/wadhwa-portrait-sig18.pdf - Google portrait mode paper
+  <li>https://www.sciencedirect.com/science/article/pii/S1877050915031968 - Enhanced Image Gradients
+  <li>https://www.comp.nus.edu.sg/~tsim/documents/defocusEstimation-published.pdf - Defocus map estimation from a single image
+  <li>https://arxiv.org/pdf/1909.05483v1.pdf - 3d ken burns
+  <li>https://arxiv.org/pdf/1810.08100.pdf - depth of field from single image
+</ol>
 
-  
-    <video width="800px" height="600px" controls>
-      <source src="images/zoom_1.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-    </video> 
-
-    We then tried to these techniques with our own depth estimation
-    <video width="800px" height="600px" controls>
-      <source src="images/our_depth.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-    </video> 
-    
-    This is me going over the results we got so far in a more approachable format.
-
-    <h3>Next Steps</h3>
-    <p>
-        Our next steps are to follow through with the Defocus map estimation method
-        and finish interpolating from the sparse defocus map we have to a full
-        defocus map using laplacian matting. We will also have to implement the thin
-        lens model that we can use on the depth map once we have our completed depth map.
-    </p>
-
-
-
-    <h2>References</h2>
-    <ol>
-      <li>http://graphics.stanford.edu/papers/portrait/wadhwa-portrait-sig18.pdf - Google portrait mode paper
-      <li>https://www.sciencedirect.com/science/article/pii/S1877050915031968 - Enhanced Image Gradients
-      <li>https://www.comp.nus.edu.sg/~tsim/documents/defocusEstimation-published.pdf - Defocus map estimation from a single image
-      <li>https://arxiv.org/pdf/1909.05483v1.pdf - 3d ken burns
-      <li>https://arxiv.org/pdf/1810.08100.pdf - depth of field from single image
-    </ol>
-
-    <h2>Contributions</h2>
-    <h3>Kevin</h3>
-    <h3>Angela</h3>
-    <h3>Ani</h3>
-
-
-
-
+<h2>Contributions</h2>
+<h3>Kevin</h3>
+<p></p>
+<h3>Angela</h3>
+<p></p>
+<h3>Ani</h3>
+<p></p>
 </div>
 </body>
 </html>
