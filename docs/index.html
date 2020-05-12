@@ -119,7 +119,45 @@
         in the foreground have original blurs less than those in the background,
         and is a hopeful sign that we are on the right track.
       </p>
-
+      <p> INSERT MORE DETAIL ON FILLING IN SPARSE MAP </p>
+      <p> Using the constructed depth map, we get strong results on a variety of images.  As reference, lighter portions of the image are closer to the camera </p>
+      <p> These results also allow us to construct visual effects on our results </p>
+    <div align="middle">
+      <table style="width=100%">
+        <tr>
+          <td>
+            <img src="images/input.png" width="400px"/>
+            <figcaption></figcaption>
+          </td>
+          <td>
+            <img src="images/bird_depth.png" width="400px"/>
+            <figcaption>Depth we generated</figcaption>
+          </td>
+          <td>
+            <img src="images/binary_blur.png" width="400px"/>
+            <figcaption>Foreground - background extraction</figcaption>
+          </td>
+          
+        </tr>
+        We can use these depth extractions for cool effects, which we will discuss later.
+        <tr>
+          <td>
+            <img src="images/super_blur.png" width="400px"/>
+            <figcaption>Enhancing bokeh effects for the picture</figcaption>
+          </td>
+          <td>
+            <video width="800" height="450" controls>
+              <source src="images/bird.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+            </video> 
+            
+          </td>
+          
+        </tr>
+        
+        
+      </table>
+    </div>
 
     <h3>Out of the box depth estimation and effects </h3>
     <p> We also used out of the box depth estimation to test out some cool effects.  We listed two we implemented below </p>
@@ -177,32 +215,28 @@
 
       </table>
     </div>
-    <div align="middle">
-      <table style="width=100%">
-        <tr>
-          <td>
-            <img src="" width="400px"/>
-            <figcaption></figcaption>
-          </td>
 
-        </tr>
-
-      </table>
-    </div>
   
     <video width="1280" height="720" controls>
       <source src="images/zoom_1.mp4" type="video/mp4">
     Your browser does not support the video tag.
     </video> 
+
+    We then tried to these techniques with our own depth estimation
+    <video width="1280" height="720" controls>
+      <source src="images/our_depth.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+    </video> 
+    
     This is me going over the results we got so far in a more approachable format.
 
-    <h3>Next Steps</h3>
-    <p>
-        Our next steps are to follow through with the Defocus map estimation method
-        and finish interpolating from the sparse defocus map we have to a full
-        defocus map using laplacian matting. We will also have to implement the thin
-        lens model that we can use on the depth map once we have our completed depth map.
-    </p>
+    <!--<h3>Next Steps</h3>
+    <!--<p>
+    <!--    Our next steps are to follow through with the Defocus map estimation method
+    <!--    and finish interpolating from the sparse defocus map we have to a full
+    <!--    defocus map using laplacian matting. We will also have to implement the thin
+    <!--    lens model that we can use on the depth map once we have our completed depth map.
+    <!--</p>
 
 
 
