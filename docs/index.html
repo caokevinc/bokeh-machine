@@ -44,12 +44,28 @@
     font-size: 12px;
     font-style: italic;
     margin-top: 10px;
+    margin-bottom: 20px;
   }
   img {
     display: block;
     margin-top: 10px;
     margin-left: auto;
     margin-right: auto;
+  }
+  table video {
+    margin: 0;
+  }
+  video {
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+  figcaption {
+    text-align: center;
+  }
+  #bird-video {
+    width: 400px;
+    margin-top: 10px;
+    margin-bottom: -6px;
   }
 </style>
 <title>CS 184 Final Project</title>
@@ -134,28 +150,28 @@
           <table style="width=100%">
             <tr valign="top">
                 <td align="middle">
-                <img src="milestone-images/yq.png" width="480px" />
+                <img src="milestone-images/yq.png" width="400px" />
                 <figcaption align="middle">Original</figcaption>
               </td>
               <td align="middle">
-              <img src="milestone-images/blurry.png" width="480px" />
+              <img src="milestone-images/blurry.png" width="400px" />
               <figcaption align="middle">Gaussian Blurred Image</figcaption>
             </tr>
             <tr>
             </td>
               <td align="middle">
-              <img src="milestone-images/diff.png" width="480px" />
+              <img src="milestone-images/diff.png" width="400px" />
               <figcaption align="middle">Ratio of original image gradient to blurred image gradient</figcaption>
             </td>
           </td>
           <td align="middle">
-          <img src="milestone-images/canny.png" width="480px" />
+          <img src="milestone-images/canny.png" width="400px" />
           <figcaption align="middle">Canny Edge Detector Edge Map</figcaption>
         </td>
         </tr>
         <tr>
             <td align="middle">
-            <img src="milestone-images/sparse.png" width="480px" />
+            <img src="milestone-images/sparse.png" width="400px" />
             <figcaption align="middle">Sparse Defocus Map</figcaption>
           </td>
           </table>
@@ -170,22 +186,24 @@
       <p> Using the constructed depth map, we get strong results on a variety of images.  As reference, lighter portions of the image are closer to the camera </p>
       <p> These results also allow us to construct visual effects on our results </p>
     <div align="middle">
-      <table style="width=100%">
+      <table>
         <tr>
           <td>
-            <img src="images/input.png" width="400px"/>
-            <figcaption></figcaption>
+            <img src="images/input.png" width="250px"/>
+            <figcaption>Original image</figcaption>
           </td>
           <td>
-            <img src="images/bird_depth.png" width="400px"/>
+            <img src="images/bird_depth.png" width="250px"/>
             <figcaption>Depth we generated</figcaption>
           </td>
           <td>
-            <img src="images/binary_blur.png" width="400px"/>
+            <img src="images/binary_blur.png" width="250px"/>
             <figcaption>Foreground - background extraction</figcaption>
           </td>
-          
         </tr>
+      </table>
+          
+     <table>
         We can use these depth extractions for cool effects, which we will discuss later.
         <tr>
           <td>
@@ -193,11 +211,11 @@
             <figcaption>Enhancing bokeh effects for the picture</figcaption>
           </td>
           <td>
-            <video width="800" height="450" controls>
+            <video id="bird-video" controls>
               <source src="images/bird.mp4" type="video/mp4">
             Your browser does not support the video tag.
             </video> 
-            
+            <figcaption>Ken Burns effect</figcaption>
           </td>
           
         </tr>
@@ -213,20 +231,16 @@
       <table style="width=100%">
         <tr>
           <td>
-            Original Image
-          </td>
-          <td>
-            <img src="images/depth.jpg" width="480px"/>
-            <figcaption>Depth mapping</figcaption>
-          </td>
-          <td>
-
-            <img src="images/rclouds.png" width="480px"/>
+            <img src="images/rclouds.png" width="400px"/>
             <figcaption>Original Image</figcaption>
           </td>
-
+          <td>
+            <img src="images/depth.jpg" width="400px"/>
+            <figcaption>Depth mapping</figcaption>
+          </td>
         </tr>
-
+      </table>
+      <table>
         <tr>
           <td>
             3D Ken Burns Effect
@@ -236,31 +250,26 @@
             In addition, blown up closer versions of the image are laid over the images farther back.  We mostly used an out of the box implementation for this part.
           </td>
           <td>
-            <video width="480" height="640" controls>
+            <video width="400px" controls>
               <source src="images/autozoom.mp4" type="video/mp4">
             Your browser does not support the video tag.
             </video>
           </td>
-
         </tr>
         <tr>
           <td>
             Artificial Lens Blur
           </td>
-
           <td>
             We establish a focus point in the depth map.  Because we only had relative depth measurements for depth, we assumed the image was focused at infinity.
             We then simulated a thin lens effect by picking a point as our point of focus, and estimating the degree of blur using lens equations learned in class.
             This technique is meant for cameras focused at infinity, and is effectively the 'inverse' of the idea of the defocus map - given a depth map, determine blur.
           </td>
           <td>
-            <img src="images/portrait.png" width="480px"/>
+            <img src="images/portrait.png" width="400px"/>
             <figcaption>partially blurred image. We did a binary mask for now, but we are looking into fast methods of using proportional blur.</figcaption>
           </td>
-
         </tr>
-
-
       </table>
     </div>
 
@@ -271,20 +280,20 @@
     </video> 
 
     We then tried to these techniques with our own depth estimation
-    <video width="1280" height="720" controls>
+    <video width="800px" height="600px" controls>
       <source src="images/our_depth.mp4" type="video/mp4">
     Your browser does not support the video tag.
     </video> 
     
     This is me going over the results we got so far in a more approachable format.
 
-    <!--<h3>Next Steps</h3>
-    <!--<p>
-    <!--    Our next steps are to follow through with the Defocus map estimation method
-    <!--    and finish interpolating from the sparse defocus map we have to a full
-    <!--    defocus map using laplacian matting. We will also have to implement the thin
-    <!--    lens model that we can use on the depth map once we have our completed depth map.
-    <!--</p>
+    <h3>Next Steps</h3>
+    <p>
+        Our next steps are to follow through with the Defocus map estimation method
+        and finish interpolating from the sparse defocus map we have to a full
+        defocus map using laplacian matting. We will also have to implement the thin
+        lens model that we can use on the depth map once we have our completed depth map.
+    </p>
 
 
 
