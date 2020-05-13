@@ -164,6 +164,8 @@ testing code</code></pre>
       </tr>
     </table>
 </div>
+<h4>Overview</h4>
+
 <p>
     In this approach, we blur the image and take the ratio of the gradients
     of the original image with the gradients of the blurred image. This ratio
@@ -172,35 +174,203 @@ testing code</code></pre>
     This effectively gives us a "defocus map" which we can roughly equate to a
     depth map.
 </p>
+<h4>Method</h4>
 <div>
   <table>
     <tr valign="top">
       <td align="middle">
-        <img src="milestone-images/yq.png" width="400px" />
-        <figcaption align="middle">Original</figcaption>
-      </td>
-      <td align="middle">
-        <img src="milestone-images/blurry.png" width="400px" />
-        <figcaption align="middle">Gaussian Blurred Image</figcaption>
+        <img src="images/method/flower.png" width="200px" />
+        <figcaption align="middle">Original Image</figcaption>
       </td>
     <tr>
+    </table>
+  </div>
+<h3>Step 1: Gaussian Blur the Image</h3>
+<p>
+  We create two images. <br>
+  i_1: original image with GaussianBlur of Standard Deviation 1 <br>
+  i_2: original image with GaussianBlur of Standard Deviation 1.5 <br>
+</p>
+<div>
+  <table>
+    <tr valign="top">
       <td align="middle">
-        <img src="milestone-images/diff.png" width="400px" />
-        <figcaption align="middle">Ratio of original image gradient to blurred image gradient</figcaption>
+        <img src="images/method/og.png" width="320px" />
+        <figcaption align="middle">i_1, Blurred with Standard Deviation 1</figcaption>
       </td>
       <td align="middle">
-        <img src="milestone-images/canny.png" width="400px" />
-        <figcaption align="middle">Canny Edge Detector Edge Map</figcaption>
+        <img src="images/method/blurry.png" width="320px" />
+        <figcaption align="middle">i_2, Blurred with Standard Deviation 2</figcaption>
       </td>
-    </tr>
     <tr>
+    </table>
+  </div>
+<h3>Step 2: Take gradient of i_1 and i_2</h3>
+<p>
+  We use Sobel filters of kernel size 1 to take image gradients in the x and y
+  direction to compute the magnitude of the full gradient.
+</p>
+<div>
+  <table>
+    <tr valign="top">
       <td align="middle">
-        <img src="milestone-images/sparse.png" width="400px" />
-        <figcaption align="middle">Sparse Defocus Map</figcaption>
+        <img src="images/method/gradienteq.png" width="320px" />
+        <figcaption align="middle">Magnitude of the gradient, where i_x and i_y are gradients in the x and y direction</figcaption>
+      </td>
+    <tr>
+    </table>
+  </div>
+Python Implementation
+
+<pre><code>  sobelx = cv2.Sobel(im, cv2.CV_64F, 1, 0, ksize=1)
+  sobely = cv2.Sobel(im, cv2.CV_64F, 0, 1, ksize=1)
+  grad = np.sqrt(sobelx**2 + sobely**2)</code></pre>
+<p>
+We use this to compute the gradients, gradient(i_1) and gradient(i_2).
+</p>
+<div>
+  <table>
+    <tr valign="top">
+      <td align="middle">
+        <img src="images/method/grad1.png" width="320px" />
+        <figcaption align="middle">Gradient of i_1</figcaption>
+      </td>
+      <td align="middle">
+        <img src="images/method/grad2.png" width="320px" />
+        <figcaption align="middle">Gradient of i_2</figcaption>
       </td>
     </tr>
   </table>
 </div>
+
+
+
+<h3>Step 3: Use ratio of gradients to derive depth estimation</h3>
+<p>We take the ratio of gradients R = Gradient(i_1)/Gradient(i_2)</p>
+
+<div>
+  <table>
+    <tr valign="top">
+      <td align="middle">
+        <img src="images/method/diff.png" width="320px" />
+        <figcaption align="middle">Map of Gradients</figcaption>
+      </td>
+    </tr>
+    </table>
+  </div>
+
+  Derivation of Depth Estimation
+
+  <div>
+    <table>
+      <tr valign="top">
+        <td align="middle">
+          <img src="images/method/r2.png" width="150px" />
+          <figcaption align="middle"></figcaption>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <p>
+    R is ratio of Gradients<br>
+    S is scene depth<br>
+    Sigma1 is Standard Deviation of Gaussian Blur applied to i_1<br>
+    Sigma2 is Standard Deviation of Gaussian Blur applied to i_2<br>
+    The intuition is that at infinite depth, or a completely out of focus region
+    of the image, adding a gaussian blur does nothing, aka R = 1. At 0 depth, or
+    a completely sharp region of the image, we expect R = sigma1/sigma2, in
+    other words, only the gaussian blurs have caused the difference. With some
+    algebra we are able to derive s, the estimated depth.
+  </p>
+    <div>
+      <table>
+        <tr valign="top">
+          <td align="middle">
+            <img src="images/method/s.png" width="150px" />
+            <figcaption align="middle"></figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div>
+      <table>
+        <tr valign="top">
+          <td align="middle">
+            <img src="images/method/sig.png" width="320px" />
+            <figcaption align="middle">Estimated Depth Map</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <p>
+      We notice that the depth estimation is strongest at edges. Defocus
+      estimation is only useful at edges, since the blur affects edges high
+      frequency areas the most.
+    </p>
+
+    <h3>Step 4: Use and Edge Map to create Sparse Defocus Map</h3>
+
+    <p>We use a Canny Edge Detector to mask for only the edges in our Depth
+      Estimation Map. This produces a sparse defocus map, where we have an
+      estimate of depth at every edge.
+    </p>
+    <div>
+      <table>
+        <tr valign="top">
+          <td align="middle">
+            <img src="images/method/sig.png" width="250px" />
+            <figcaption align="middle">Estimated Depth Map</figcaption>
+          </td>
+          <td align="middle">
+            <img src="images/method/star.png" width="80px" />
+          </td>
+          <td align="middle">
+            <img src="images/method/edgemap.png" width="250px" />
+            <figcaption align="middle">Edge Map</figcaption>
+          </td>
+          <td align="middle">
+            <img src="images/method/equal.png" width="75px" />
+          </td>
+          <td align="middle">
+            <img src="images/method/sparse.png" width="250px" />
+            <figcaption align="middle">Sparse Defocus Map</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+<h3>Step 5: Matting Laplacian</h3>
+<p>TODO</p>
+<h3>Step 6. (Optional) Increase contrast</h3>
+<p>
+  Sometimes we get flat depth maps. To increase the spread of depth,
+  we can use a Gamma Correction to increase the contrast.
+</p>
+<div>
+  <table>
+    <tr valign="top">
+      <td align="middle">
+        <img src="images/method/gamma.png" width="100px" />
+        <figcaption align="middle">Gamma Correction</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<table>
+  <tr valign="top">
+    <td align="middle">
+      <img src="images/method/iflower.png" width="250px" />
+      <figcaption align="middle">Raw Defocus Map</figcaption>
+    </td>
+    <td align="middle">
+      <img src="images/method/iflowercontrast.png" width="250px" />
+      <figcaption align="middle">Added Contrast Defocus Map</figcaption>
+    </td>
+  </tr>
+</table>
+</div>
+
+
+
 <p>
   We can see in the sparse defocus map that edges in the foreground are lighter than
   those in the background. In this visualization, this means that the edges
@@ -240,7 +410,7 @@ testing code</code></pre>
         <video id="bird-video" controls>
           <source src="images/bird.mp4" type="video/mp4">
           Your browser does not support the video tag.
-        </video> 
+        </video>
         <figcaption>Ken Burns effect</figcaption>
       </td>
     </tr>
@@ -333,12 +503,12 @@ testing code</code></pre>
 <video width="800px" height="600px" controls>
   <source src="images/zoom_1.mp4" type="video/mp4">
   Your browser does not support the video tag.
-</video> 
+</video>
 <p>We then tried to these techniques with our own depth estimation</p>
 <video width="800px" height="600px" controls>
   <source src="images/our_depth.mp4" type="video/mp4">
   Your browser does not support the video tag.
-</video> 
+</video>
 <p>This is me going over the results we got so far in a more approachable format.</p>
 <h3>Next Steps</h3>
 <p>
