@@ -606,13 +606,15 @@ Now, the variable full_map contains d, the full depth map.
 <p>This project involved working with large sparse matrices - L, the matting Laplacian, and D, the diagonalized edge detections - as coefficients in a linear equation. For instance, the matrix D for our initial 800 x 600 sample image was 480000 x 480000 with only a few thousand nonzero values. Thus, it was unrealistic for us to try to find the exact solution, so we had to use an approximator. One challenge we didn’t anticipate was that different approximators (np.linalg.solve, scipy.sparse.spsolve, and the Matlab mldivide operator) yielded different results, some of which were significantly inaccurate. We found that spsolve with 1000 iterations was a reliable approximator.</p>
 <p>We also observed that hyperparameters like kernel size, edge detection threshold, lambda, etc. heavily affected the accuracy of our depth map. For example, setting epsilon (regularization strength) too high in the matting Laplacian function, with an otherwise correct implementation, produced an incomprehensible depth map.</p>
 <h3>Final thoughts</h3>
+<p>With depth mapping a popular feature of many modern smartphones using fancy multi lens arrays and machine learning algorithms, we wanted to take a step back and explore monocular, model free methods of determining depth in an image. We contribute a Python implementation of monocular depth mapping through defocus map estimation, using the natural defocus of a lens to estimate depth. This method gives us reasonable results in certain situations, but is otherwise a poor depth mapping method in general.</p>
+<p>Working on this project has given us some more intuition for how much more intelligence is needed to effectively determine depth in an image, either through inference models found in machine learning, or through stereo views.</p>
 <h2>Contributions</h2>
 <h3>Kevin</h3>
-<p></p>
+<p>Experimented with enhanced image gradient method, implemented defocus map estimation method.</p>
 <h3>Angela</h3>
-<p></p>
+<p>Worked on sparse to full interpolation step (implementing L, D and finding solver), helped tune, clean, format and convert to script.</p>
 <h3>Ani</h3>
-<p></p>
+<p>Worked on effects (portrait mode, bokeh effects, and 3d ken burns).</p>
 </div>
 </body>
 </html>
