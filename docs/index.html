@@ -96,55 +96,56 @@ testing code</code></pre>
   We were motivated by depth-of-field based visual effects like portrait mode (blurring based on depth) and Ken Burns (zooming based on depth). Given a singular image, these effects can be implemented with the help of a full depth map, which maps each pixel to a scalar indicating its depth value. Our main technical objective for this project was to calculate a depth map for an image from scratch.
 </p>
 <p>Examples of visual effects:</p>
-<div>
+<div align="center">
   <table>
     <tr valign="top">
-      <td align="middle">
+      <td >
         <img src="final-images/portrait.jpeg" width="375px" />
-        <figcaption align="middle">Portrait mode</figcaption>
+        <figcaption >Portrait mode</figcaption>
       </td>
-      <td align="middle">
+      <td >
         <img src="final-images/kenburns.gif" width="400px" />
-        <figcaption align="middle">Ken Burns effect</figcaption>
+        <figcaption >Ken Burns effect</figcaption>
       </td>
     </tr>
   </table>
 </div>
 <p>Example of a depth map:</p>
 <img src="final-images/depthmap.jpg" width="700px" />
-<figcaption align="middle">Sample depth map, with depth values ranging from 0 to 255; lighter color indicates closer</figcaption>
+<figcaption >Sample depth map, with depth values ranging from 0 to 255; lighter color indicates closer</figcaption>
 <p>
-  After trying a few possible approaches, we decided to move forward with implementing an algorithm from the paper "Defocus map estimation from a single image". We were able to achieve visually similar depth maps to both the results from the original paper and depth maps generated from photography apps. Once our implementation was finished, we used off-the-shelf portrait mode and Ken Burns effect generators to apply these visual effects to our own images.
+  After trying a few possible approaches, we decided to move forward with implementing an algorithm from the paper "Defocus map estimation from a single image" (3). We were able to achieve visually similar depth maps to both the results from the original paper and depth maps generated from photography apps. Once our implementation was finished, we used off-the-shelf portrait mode and Ken Burns effect generators to apply these visual effects to our own images.
 </p>
 
 <h2>Technical Approach</h2>
-<h3>Enhanced Image Gradients</h3>
 <p>
-  We first tried a method from
-  <a href="https://www.sciencedirect.com/science/article/pii/S1877050915031968"> this paper</a>
+We found a lot of literature about depth estimation. Intuitively, most of it involves comparing gradients at different sections of an image to determine how relatively blurry those sections are.
+</p>
+<p>
+  We first tried a method from the paper "Recovering Depth Map from Enhanced Image Gradients" (2)
   that tries to find a depth map with gradients close to the original image gradient.
   The assumption is that the gradients in the depth map should match up
-  to the gradients in the image. The paper suggests and error function
+  to the gradients in the image. The paper suggests an error function
   relating the image gradient to the depth map gradients and provides a
   closed form solution for the depth map.
 </p>
-<div>
+<div align="center">
   <table>
     <tr valign="top">
-      <td align="middle">
+      <td >
         <img src="milestone-images/enhancedalgo.png" width="800px" />
-        <figcaption align="middle">Algorithm for constructing Depth Map from Bala et. al</figcaption>
+        <figcaption >Algorithm for constructing Depth Map from Bala et. al</figcaption>
       </td>
   </table>
   <table>
     <tr valign="top">
-      <td align="middle">
+      <td >
         <img src="milestone-images/yq.png" width="400px" />
-        <figcaption align="middle">Original</figcaption>
+        <figcaption >Original</figcaption>
       </td>
-      <td align="middle">
+      <td >
         <img src="milestone-images/enhanced.png" width="400px" />
-        <figcaption align="middle">Depth Map</figcaption>
+        <figcaption >Depth Map</figcaption>
       </td>
     </tr>
   </table>
@@ -153,91 +154,83 @@ testing code</code></pre>
   However we found that this method gave us a weak, and frankly horrifying
   depth map. This, at least in its current implementation, is a dead end for us.
 </p>
-<h3>Defocus map estimation</h3>
-<div>
-    <table>
-      <tr valign="top">
-        <td align="middle">
-          <img src="milestone-images/edgeblur.png" width="800px" />
-          <figcaption align="middle">Overview of blur estimation approach, taken from Zhuo et. al</figcaption>
-        </td>
-      </tr>
-    </table>
-</div>
-<h4>Overview</h4>
-
+<h3>Defocus Map Estimation: Overview</h3>
+<img src="milestone-images/edgeblur.png" width="800px" />
+<figcaption >Overview of blur estimation approach, taken from Zhuo et. al</figcaption>
 <p>
+  This algorithm from "Defocus map estimation from a single image" was the second approach we tried and the one that worked best for us.
     In this approach, we blur the image and take the ratio of the gradients
     of the original image with the gradients of the blurred image. This ratio
     gives us an estimation of the standard deviation of the original blur of a
-    region of the image, as we model out of focus areas as a gaussian blur.
+    region of the image, as we model out of focus areas as a Gaussian blur.
     This effectively gives us a "defocus map" which we can roughly equate to a
     depth map.
 </p>
-<h4>Method</h4>
-<div>
+<p>
+  Intuitively, this algorithm takes advantage of 2 assumptions: first, in an image with shallow depth of field, objects at a greater depth will be blurrier. Second, blurring an in-focus object will change its appearance more than blurring an already out-of-focus object. Overall, the ratio of gradients at a certain pixel before and after it has been blurred will correspond to how blurry, and therefore how far away from the camera the scene is at that pixel.
+</p>
+<div align="center">
   <table>
     <tr valign="top">
-      <td align="middle">
-        <img src="images/method/flower.png" width="200px" />
-        <figcaption align="middle">Original Image</figcaption>
+      <td >
+        <img src="images/method/flower.png" width="400px" />
+        <figcaption >Original image</figcaption>
       </td>
     <tr>
-    </table>
-  </div>
-<h3>Step 1: Gaussian Blur the Image</h3>
+  </table>
+</div>
+<h4>Step 1: Gaussian blur the image</h4>
 <p>
-  We create two images. <br>
+  We create two images:<br>
   i_1: original image with GaussianBlur of Standard Deviation 1 <br>
   i_2: original image with GaussianBlur of Standard Deviation 1.5 <br>
 </p>
-<div>
+<div align="center">
   <table>
     <tr valign="top">
-      <td align="middle">
+      <td >
         <img src="images/method/og.png" width="320px" />
-        <figcaption align="middle">i_1, Blurred with Standard Deviation 1</figcaption>
+        <figcaption >i_1, blurred with standard deviation 1</figcaption>
       </td>
-      <td align="middle">
+      <td >
         <img src="images/method/blurry.png" width="320px" />
-        <figcaption align="middle">i_2, Blurred with Standard Deviation 2</figcaption>
+        <figcaption >i_2, blurred with standard deviation 2</figcaption>
       </td>
     <tr>
     </table>
   </div>
-<h3>Step 2: Take gradient of i_1 and i_2</h3>
+<h4>Step 2: Take gradients of i_1 and i_2</h4>
 <p>
   We use Sobel filters of kernel size 1 to take image gradients in the x and y
-  direction to compute the magnitude of the full gradient.
+  directions to compute the magnitude of the full gradient.
 </p>
-<div>
+<div align="center">
   <table>
     <tr valign="top">
-      <td align="middle">
+      <td >
         <img src="images/method/gradienteq.png" width="320px" />
-        <figcaption align="middle">Magnitude of the gradient, where i_x and i_y are gradients in the x and y direction</figcaption>
+        <figcaption >Magnitude of the gradient, where i_x and i_y are gradients in the x and y direction</figcaption>
       </td>
     <tr>
     </table>
   </div>
-Python Implementation
-
-<pre><code>  sobelx = cv2.Sobel(im, cv2.CV_64F, 1, 0, ksize=1)
-  sobely = cv2.Sobel(im, cv2.CV_64F, 0, 1, ksize=1)
-  grad = np.sqrt(sobelx**2 + sobely**2)</code></pre>
+Python implementation:
+<pre><code>sobelx = cv2.Sobel(im, cv2.CV_64F, 1, 0, ksize=1)
+sobely = cv2.Sobel(im, cv2.CV_64F, 0, 1, ksize=1)
+grad = np.sqrt(sobelx**2 + sobely**2)</code></pre>
 <p>
 We use this to compute the gradients, gradient(i_1) and gradient(i_2).
 </p>
-<div>
+<div align="center">
   <table>
     <tr valign="top">
-      <td align="middle">
+      <td >
         <img src="images/method/grad1.png" width="320px" />
-        <figcaption align="middle">Gradient of i_1</figcaption>
+        <figcaption >Gradient of i_1</figcaption>
       </td>
-      <td align="middle">
+      <td >
         <img src="images/method/grad2.png" width="320px" />
-        <figcaption align="middle">Gradient of i_2</figcaption>
+        <figcaption >Gradient of i_2</figcaption>
       </td>
     </tr>
   </table>
@@ -245,59 +238,61 @@ We use this to compute the gradients, gradient(i_1) and gradient(i_2).
 
 
 
-<h3>Step 3: Use ratio of gradients to derive depth estimation</h3>
-<p>We take the ratio of gradients R = Gradient(i_1)/Gradient(i_2)</p>
+<h4>Step 3: Use ratio of gradients to derive depth estimation</h4>
+<p>We take the ratio of gradients R = gradient(i_1)/gradient(i_2).</p>
 
-<div>
+<div align="center">
   <table>
     <tr valign="top">
-      <td align="middle">
+      <td >
         <img src="images/method/diff.png" width="320px" />
-        <figcaption align="middle">Map of Gradients</figcaption>
+        <figcaption >Map of Gradients</figcaption>
       </td>
     </tr>
     </table>
   </div>
 
-  Derivation of Depth Estimation
+  Derivation of depth estimation:
 
-  <div>
+  <div align="center">
     <table>
       <tr valign="top">
-        <td align="middle">
+        <td >
           <img src="images/method/r2.png" width="150px" />
-          <figcaption align="middle"></figcaption>
+          <figcaption ></figcaption>
         </td>
       </tr>
     </table>
   </div>
   <p>
-    R is ratio of Gradients<br>
-    S is scene depth<br>
-    Sigma1 is Standard Deviation of Gaussian Blur applied to i_1<br>
-    Sigma2 is Standard Deviation of Gaussian Blur applied to i_2<br>
+    where:<br/>
+    R is ratio of gradients<br>
+    s is scene depth<br>
+    &sigma;_1 is standard deviation of Gaussian blur applied to i_1<br>
+    &sigma;_2 is standard deviation of Gaussian blur applied to i_2<br>
+  </p><p>
     The intuition is that at infinite depth, or a completely out of focus region
     of the image, adding a gaussian blur does nothing, aka R = 1. At 0 depth, or
-    a completely sharp region of the image, we expect R = sigma1/sigma2, in
-    other words, only the gaussian blurs have caused the difference. With some
+    a completely sharp region of the image, we expect R = &sigma;_1/&sigma;_2; in
+    other words, only the Gaussian blurs have caused the difference. With some
     algebra we are able to derive s, the estimated depth.
   </p>
-    <div>
+    <div align="center">
       <table>
         <tr valign="top">
-          <td align="middle">
+          <td >
             <img src="images/method/s.png" width="150px" />
-            <figcaption align="middle"></figcaption>
+            <figcaption ></figcaption>
           </td>
         </tr>
       </table>
     </div>
-    <div>
+    <div align="center">
       <table>
         <tr valign="top">
-          <td align="middle">
+          <td >
             <img src="images/method/sig.png" width="320px" />
-            <figcaption align="middle">Estimated Depth Map</figcaption>
+            <figcaption >Estimated depth map</figcaption>
           </td>
         </tr>
       </table>
@@ -308,65 +303,91 @@ We use this to compute the gradients, gradient(i_1) and gradient(i_2).
       frequency areas the most.
     </p>
 
-    <h3>Step 4: Use and Edge Map to create Sparse Defocus Map</h3>
+    <h4>Step 4: Use depth map and edge map to create sparse defocus map</h4>
 
-    <p>We use a Canny Edge Detector to mask for only the edges in our Depth
-      Estimation Map. This produces a sparse defocus map, where we have an
+    <p>We use a Canny edge detector to mask for only the edges in our depth
+      estimation map. This produces a sparse defocus map, where we have an
       estimate of depth at every edge.
     </p>
-    <div>
+    <div align="center">
       <table>
         <tr valign="top">
-          <td align="middle">
-            <img src="images/method/sig.png" width="250px" />
-            <figcaption align="middle">Estimated Depth Map</figcaption>
+          <td >
+            <img src="images/method/sig.png" width="200px" />
+            <figcaption >Estimated depth map</figcaption>
           </td>
-          <td align="middle">
-            <img src="images/method/star.png" width="80px" />
+          <td >
+            <img src="images/method/star.png" width="60px" />
           </td>
-          <td align="middle">
-            <img src="images/method/edgemap.png" width="250px" />
-            <figcaption align="middle">Edge Map</figcaption>
+          <td >
+            <img src="images/method/edgemap.png" width="200px" />
+            <figcaption >Edge map</figcaption>
           </td>
-          <td align="middle">
-            <img src="images/method/equal.png" width="75px" />
+          <td >
+            <img src="images/method/equal.png" width="55px" />
           </td>
-          <td align="middle">
-            <img src="images/method/sparse.png" width="250px" />
-            <figcaption align="middle">Sparse Defocus Map</figcaption>
+          <td >
+            <img src="images/method/sparse.png" width="200px" />
+            <figcaption >Sparse defocus map</figcaption>
           </td>
         </tr>
       </table>
     </div>
-<h3>Step 5: Matting Laplacian</h3>
-<p>TODO</p>
-<h3>Step 6. (Optional) Increase contrast</h3>
+<h4>Step 5: Matting Laplacian</h4>
+<p>Finally, we calculate the matting Laplacian matrix of the original image. An image's matting Laplacian is a H*W x H*W matrix that quantifies how different each pair of pixels is from one another, taking both RGB value and pixel distance into account. This is useful in segmentation tasks like calculating the alpha matte, a mask that segments foreground from background, of a given image.</p>
+<img src="images/method/laplacian.png" width="500px" />
+<figcaption >Equation of matting Laplacian</figcaption>
+<p>We can use this measure of pairwise difference to determine which pixels are likely to belong to the same object and therefore the same depth level. This allows us to interpolate between depths in our sparse edge map to fill it in.</p>
+<p>Mathematically, we want to find a full defocus map d, which should both be close to the sparse defocus map d-hat everywhere d-hat is defined, and change continuity at image edges; we can formulate this as the minimization of a cost function E(d):</p>
+<img src="images/method/e.png" width="320px" />
+<figcaption >Full depth map cost function</figcaption>
+<p>We can derive that argmin(d) satisfies this equation:</p>
+<img src="images/method/l.png" width="180px" />
+<figcaption >Linear equation that holds at optimal d</figcaption>
+where:<br/>
+d-hat is the sparse defocus map we have<br/>
+d is the full defocus map we want<br/>
+&lambda; is a parameter balancing smoothness vs. fidelity to our sparse map<br/>
+L is the image's matting Laplacian<br/>
+D is a diagonal representation of our earlier edge detection<br/>
+<p>We implement this in Python using cf_laplacian from the pymatting library and scipy's spsolve linear equation solver.</p>
+<p>Matting Laplacian and edge diagonal:</p>
+<pre><code>normed = (imcolor.astype(float) / np.linalg.norm(imcolor.astype(float)))
+L = cf_laplacian(normed, epsilon=1e-11, radius=1)
+D = scipy.sparse.diags(edges.flatten(), dtype=np.int8)</code></pre>
+Setting up and solving the linear equation:
+<pre><code>lamb = 0.001
+A = scipy.sparse.csc_matrix(L + lamb * D)
+b = scipy.sparse.csc_matrix(lamb * D * sparse_denoised.flatten()).T
+x = scipy.sparse.linalg.spsolve(A, b)[:, np.newaxis]
+full = x.reshape(sparse.shape)</code></pre>
+Now, the variable full contains d, the full depth map.
+<h4>Step 6: (Optional) Increase contrast</h4>
 <p>
   Sometimes we get flat depth maps. To increase the spread of depth,
-  we can use a Gamma Correction to increase the contrast.
+  we can use a gamma correction to increase the contrast.
 </p>
-<div>
+<div align="center">
   <table>
     <tr valign="top">
-      <td align="middle">
+      <td >
         <img src="images/method/gamma.png" width="100px" />
-        <figcaption align="middle">Gamma Correction</figcaption>
+        <figcaption >Gamma correction</figcaption>
       </td>
     </tr>
   </table>
-</div>
-<table>
-  <tr valign="top">
-    <td align="middle">
-      <img src="images/method/iflower.png" width="250px" />
-      <figcaption align="middle">Raw Defocus Map</figcaption>
-    </td>
-    <td align="middle">
-      <img src="images/method/iflowercontrast.png" width="250px" />
-      <figcaption align="middle">Added Contrast Defocus Map</figcaption>
-    </td>
-  </tr>
-</table>
+  <table>
+    <tr valign="top">
+      <td >
+        <img src="images/method/iflower.png" width="320px" />
+        <figcaption >Raw defocus map</figcaption>
+      </td>
+      <td >
+        <img src="images/method/iflowercontrast.png" width="320px" />
+        <figcaption >Added contrast defocus map</figcaption>
+      </td>
+    </tr>
+  </table>
 </div>
 
 
@@ -380,7 +401,7 @@ We use this to compute the gradients, gradient(i_1) and gradient(i_2).
 <p> INSERT MORE DETAIL ON FILLING IN SPARSE MAP </p>
 <p> Using the constructed depth map, we get strong results on a variety of images.  As reference, lighter portions of the image are closer to the camera </p>
 <p> These results also allow us to construct visual effects on our results </p>
-<div>
+<div align="center">
   <table>
     <tr>
       <td>
@@ -399,7 +420,7 @@ We use this to compute the gradients, gradient(i_1) and gradient(i_2).
   </table>
 </div>
 <p>We can use these depth extractions for cool effects, which we will discuss later.</p>
-<div>
+<div align="center">
   <table>
     <tr>
       <td>
@@ -417,7 +438,7 @@ We use this to compute the gradients, gradient(i_1) and gradient(i_2).
   </table>
 </div>
 <p>We tested our depth map estimation on a variety of images, and got generally good results.  For a tough scenario, We took some pictures of one of flowers, which are highly detailed and complex depth maps. </p>
-<div>
+<div align="center">
   <table>
     <tr>
       <td>
@@ -454,8 +475,8 @@ We use this to compute the gradients, gradient(i_1) and gradient(i_2).
 
 <h2>Results</h2>
 <h3>Out of the box depth estimation and effects </h3>
-<p> We also used out of the box depth estimation to test out some cool effects.  We listed two we implemented below </p>
-<div>
+<p> We also used out of the box depth estimation to test out some cool effects.  We listed two we implemented below. </p>
+<div align="center">
   <table>
     <tr>
       <td>
@@ -471,7 +492,7 @@ We use this to compute the gradients, gradient(i_1) and gradient(i_2).
   <table>
     <tr>
       <td>
-        3D Ken Burns Effect
+        <b>3D Ken Burns Effect</b>
       </td>
       <td>
         Elements which are closer to the camera are zoomed in more than those farther away, simulating the camera moving closer to the image.
@@ -486,7 +507,7 @@ We use this to compute the gradients, gradient(i_1) and gradient(i_2).
     </tr>
     <tr>
       <td>
-        Artificial Lens Blur
+        <b>Artificial Lens Blur</b>
       </td>
       <td>
         We establish a focus point in the depth map.  Because we only had relative depth measurements for depth, we assumed the image was focused at infinity.
