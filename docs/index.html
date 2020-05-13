@@ -89,11 +89,8 @@
 <h1>Kevin Cao, Angela Dong, Aniruddha Nrusimha </h1>
 
 <h2>Abstract</h2>
-<pre><code>testing code
-sldkfj
-testing code</code></pre>
 <p>
-  We were motivated by depth-of-field based visual effects like portrait mode (blurring based on depth) and Ken Burns (zooming based on depth). Given a singular image, these effects can be implemented with the help of a full depth map, which maps each pixel to a scalar indicating its depth value. Our main technical objective for this project was to calculate a depth map for an image from scratch.
+  We were motivated by depth-of-field based visual effects like portrait mode (blurring based on depth) and Ken Burns (zooming based on depth). Given a single image, these effects can be implemented with the help of a full depth map, which is a map from each pixel to a scalar indicating its depth value. Our main technical objective for this project was to calculate a depth map for an image from scratch without using stereo or machine learning.
 </p>
 <p>Examples of visual effects:</p>
 <div align="center">
@@ -101,11 +98,11 @@ testing code</code></pre>
     <tr valign="top">
       <td >
         <img src="final-images/portrait.jpeg" width="375px" />
-        <figcaption >Portrait mode</figcaption>
+        <figcaption >Portrait mode: farther objects are blurred more heavily</figcaption>
       </td>
       <td >
         <img src="final-images/kenburns.gif" width="400px" />
-        <figcaption >Ken Burns effect</figcaption>
+        <figcaption >Ken Burns effect: closer objects zoom in more quickly</figcaption>
       </td>
     </tr>
   </table>
@@ -114,7 +111,7 @@ testing code</code></pre>
 <img src="final-images/depthmap.jpg" width="700px" />
 <figcaption >Sample depth map, with depth values ranging from 0 to 255; lighter color indicates closer</figcaption>
 <p>
-  After trying a few possible approaches, we decided to move forward with implementing an algorithm from the paper "Defocus map estimation from a single image" (3). We were able to achieve visually similar depth maps to both the results from the original paper and depth maps generated from photography apps. Once our implementation was finished, we used off-the-shelf portrait mode and Ken Burns effect generators to apply these visual effects to our own images.
+  After trying a few possible approaches, we decided to move forward with implementing an algorithm from the paper "Defocus map estimation from a single image" (3). We were able to achieve visually similar depth maps to both the results from the original paper and depth maps generated from photography apps. Once our implementation was finished, we used off-the-shelf portrait mode and Ken Burns effect generators to apply these visual effects to our own images, with some limitations.
 </p>
 
 <h2>Technical Approach</h2>
@@ -329,7 +326,7 @@ We use this to compute the gradients, gradient(i_1) and gradient(i_2).
         </tr>
       </table>
     </div>
-<h4>Step 5: Matting Laplacian</h4>
+<h4>Step 5: Interpolate using matting Laplacian</h4>
 <p>Finally, we calculate the matting Laplacian matrix of the original image. An image's matting Laplacian is a H*W x H*W matrix that quantifies how different each pair of pixels is from one another, taking both RGB value and pixel distance into account. This is useful in segmentation tasks like calculating the alpha matte, a mask that segments foreground from background, of a given image.</p>
 <img src="images/method/laplacian.png" width="500px" />
 <figcaption >Equation of matting Laplacian</figcaption>
@@ -337,7 +334,7 @@ We use this to compute the gradients, gradient(i_1) and gradient(i_2).
 <p>Mathematically, we want to find a full defocus map d, which should both be close to the sparse defocus map d-hat everywhere d-hat is defined, and change continuity at image edges; we can formulate this as the minimization of a cost function E(d):</p>
 <img src="images/method/e.png" width="320px" />
 <figcaption >Full depth map cost function</figcaption>
-<p>We can derive that argmin(d) satisfies this equation:</p>
+<p>We can derive that argmin(d) satisfies the following equation:</p>
 <img src="images/method/l.png" width="180px" />
 <figcaption >Linear equation that holds at optimal d</figcaption>
 where:<br/>
@@ -348,16 +345,16 @@ L is the image's matting Laplacian<br/>
 D is a diagonal representation of our earlier edge detection<br/>
 <p>We implement this in Python using cf_laplacian from the pymatting library and scipy's spsolve linear equation solver.</p>
 <p>Matting Laplacian and edge diagonal:</p>
-<pre><code>normed = (imcolor.astype(float) / np.linalg.norm(imcolor.astype(float)))
+<pre><code>normed = (image.astype(float) / np.linalg.norm(image.astype(float)))
 L = cf_laplacian(normed, epsilon=1e-11, radius=1)
 D = scipy.sparse.diags(edges.flatten(), dtype=np.int8)</code></pre>
 Setting up and solving the linear equation:
 <pre><code>lamb = 0.001
 A = scipy.sparse.csc_matrix(L + lamb * D)
-b = scipy.sparse.csc_matrix(lamb * D * sparse_denoised.flatten()).T
+b = scipy.sparse.csc_matrix(lamb * D * sparse_map.flatten()).T
 x = scipy.sparse.linalg.spsolve(A, b)[:, np.newaxis]
-full = x.reshape(sparse.shape)</code></pre>
-Now, the variable full contains d, the full depth map.
+full_map = x.reshape(sparse.shape)</code></pre>
+Now, the variable full_map contains d, the full depth map.
 <h4>Step 6: (Optional) Increase contrast</h4>
 <p>
   Sometimes we get flat depth maps. To increase the spread of depth,
@@ -528,7 +525,7 @@ Now, the variable full contains d, the full depth map.
 </video>
 <p>This is me going over the results we got so far in a more approachable format.</p>
 <h2>Limitations</h2>
-<h3>Objects in Front of the plane of focus</h3>
+<h3>Objects in front of the plane of focus</h3>
 <p>
   Since we estimate depth with how much region is out of focus, objects out of
   focus in front of the plane of focus are estimated to have great depth - there
@@ -556,12 +553,12 @@ Now, the variable full contains d, the full depth map.
   true. This is because the plane of focus is on that petal, and petals closer to the
   camera are rendered out of focus, and estimated to be further in the scene.
 </p>
-<h3>Color Correlation</h3>
+<h3>Color correlation</h3>
 <p>
   The depth of an object in the scene should be independent of what color it is.
-  However defocus estimation ends up being affected by the colors anyway. The
+  However, defocus estimation ends up being affected by the colors anyway. The
   distribution of color around the image appears to affect the gradients of the
-  image.
+  image. This affects both the gradient comparison step and the interpolation step using the matting Laplacian, which factors RGB difference into pixel difference.
 </p>
 <div>
 <table>
@@ -601,17 +598,14 @@ Now, the variable full contains d, the full depth map.
   especially across regions where the lighting falls. Part of this can also be
   attributed to the numerical instability in dividing gradients.
 </p>
+<p>In our repository, we've included a Jupyter Notebook and a Python script containing our implementation.</p>
 </div>
 
-<h2>References</h2>
-<ol>
-  <li>http://graphics.stanford.edu/papers/portrait/wadhwa-portrait-sig18.pdf - Google portrait mode paper
-  <li>https://www.sciencedirect.com/science/article/pii/S1877050915031968 - Enhanced Image Gradients
-  <li>https://www.comp.nus.edu.sg/~tsim/documents/defocusEstimation-published.pdf - Defocus map estimation from a single image
-  <li>https://arxiv.org/pdf/1909.05483v1.pdf - 3d ken burns
-  <li>https://arxiv.org/pdf/1810.08100.pdf - depth of field from single image
-</ol>
-
+<h2>Conclusion</h2>
+<h3>Lessons learned</h3>
+<p>This project involved working with large sparse matrices - L, the matting Laplacian, and D, the diagonalized edge detections - as coefficients in a linear equation. For instance, the matrix D for our initial 800 x 600 sample image was 480000 x 480000 with only a few thousand nonzero values. Thus, it was unrealistic for us to try to find the exact solution, so we had to use an approximator. One challenge we didn’t anticipate was that different approximators (np.linalg.solve, scipy.sparse.spsolve, and the Matlab mldivide operator) yielded different results, some of which were significantly inaccurate. We found that spsolve with 1000 iterations was a reliable approximator.</p>
+<p>We also observed that hyperparameters like kernel size, edge detection threshold, lambda, etc. heavily affected the accuracy of our depth map. For example, setting epsilon (regularization strength) too high in the matting Laplacian function, with an otherwise correct implementation, produced an incomprehensible depth map.</p>
+<h3>Final thoughts</h3>
 <h2>Contributions</h2>
 <h3>Kevin</h3>
 <p></p>
@@ -622,3 +616,13 @@ Now, the variable full contains d, the full depth map.
 </div>
 </body>
 </html>
+
+
+<h2>References</h2>
+<ol>
+  <li>http://graphics.stanford.edu/papers/portrait/wadhwa-portrait-sig18.pdf - Google portrait mode paper
+  <li>https://www.sciencedirect.com/science/article/pii/S1877050915031968 - Enhanced Image Gradients
+  <li>https://www.comp.nus.edu.sg/~tsim/documents/defocusEstimation-published.pdf - Defocus map estimation from a single image
+  <li>https://arxiv.org/pdf/1909.05483v1.pdf - 3d ken burns
+  <li>https://arxiv.org/pdf/1810.08100.pdf - depth of field from single image
+</ol>
