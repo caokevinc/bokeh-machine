@@ -43,6 +43,7 @@
     padding: 0.75em 1em;
     background: #f4f4f4;
     border: solid 1px #eeeeee;
+    border-radius: 4px;
     margin-bottom: 20px;
   }
   code {
@@ -55,7 +56,7 @@
     font-size: 12px;
     font-style: italic;
     margin-top: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     text-align: center;
   }
   img {
@@ -92,10 +93,28 @@
 sldkfj
 testing code</code></pre>
 <p>
-  We worked on three approaches to implmenting a depth map, each from
-  a different paper. Our experiments have been giving us more intuition
-  about the depth map problem, and should hopefully allow us to continue
-  more productively.
+  We were motivated by depth-of-field based visual effects like portrait mode (blurring based on depth) and Ken Burns (zooming based on depth). Given a singular image, these effects can be implemented with the help of a full depth map, which maps each pixel to a scalar indicating its depth value. Our main technical objective for this project was to calculate a depth map for an image from scratch.
+</p>
+<p>Examples of visual effects:</p>
+<div>
+  <table>
+    <tr valign="top">
+      <td align="middle">
+        <img src="final-images/portrait.jpeg" width="375px" />
+        <figcaption align="middle">Portrait mode</figcaption>
+      </td>
+      <td align="middle">
+        <img src="final-images/kenburns.gif" width="400px" />
+        <figcaption align="middle">Ken Burns effect</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<p>Example of a depth map:</p>
+<img src="final-images/depthmap.jpg" width="700px" />
+<figcaption align="middle">Sample depth map, with depth values ranging from 0 to 255; lighter color indicates closer</figcaption>
+<p>
+  After trying a few possible approaches, we decided to move forward with implementing an algorithm from the paper "Defocus map estimation from a single image". We were able to achieve visually similar depth maps to both the results from the original paper and depth maps generated from photography apps. Once our implementation was finished, we used off-the-shelf portrait mode and Ken Burns effect generators to apply these visual effects to our own images.
 </p>
 
 <h2>Technical Approach</h2>
@@ -110,25 +129,25 @@ testing code</code></pre>
   closed form solution for the depth map.
 </p>
 <div>
-    <table>
-      <tr valign="top">
-        <td align="middle">
-          <img src="milestone-images/enhancedalgo.png" width="800px" />
-          <figcaption align="middle">Algorithm for constructing Depth Map from Bala et. al</figcaption>
-        </td>
-    </table>
-    <table>
-      <tr valign="top">
-        <td align="middle">
-          <img src="milestone-images/yq.png" width="400px" />
-          <figcaption align="middle">Original</figcaption>
-        </td>
-        <td align="middle">
-          <img src="milestone-images/enhanced.png" width="400px" />
-          <figcaption align="middle">Depth Map</figcaption>
-        </td>
-      </tr>
-    </table>
+  <table>
+    <tr valign="top">
+      <td align="middle">
+        <img src="milestone-images/enhancedalgo.png" width="800px" />
+        <figcaption align="middle">Algorithm for constructing Depth Map from Bala et. al</figcaption>
+      </td>
+  </table>
+  <table>
+    <tr valign="top">
+      <td align="middle">
+        <img src="milestone-images/yq.png" width="400px" />
+        <figcaption align="middle">Original</figcaption>
+      </td>
+      <td align="middle">
+        <img src="milestone-images/enhanced.png" width="400px" />
+        <figcaption align="middle">Depth Map</figcaption>
+      </td>
+    </tr>
+  </table>
 </div>
 <p>
   However we found that this method gave us a weak, and frankly horrifying
