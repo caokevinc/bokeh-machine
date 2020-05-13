@@ -169,16 +169,8 @@ We found a lot of literature about depth estimation. Intuitively, most of it inv
 <p>
   Intuitively, this algorithm takes advantage of 2 assumptions: first, in an image with shallow depth of field, objects at a greater depth will be blurrier. Second, blurring an in-focus object will change its appearance more than blurring an already out-of-focus object. Overall, the ratio of gradients at a certain pixel before and after it has been blurred will correspond to how blurry, and therefore how far away from the camera the scene is at that pixel.
 </p>
-<div align="center">
-  <table>
-    <tr valign="top">
-      <td >
-        <img src="images/method/flower.png" width="400px" />
-        <figcaption >Original image</figcaption>
-      </td>
-    <tr>
-  </table>
-</div>
+<img src="images/method/overview.png" width="800px" />
+<figcaption >Method overview</figcaption>
 <h4>Step 1: Gaussian blur the image</h4>
 <p>
   We create two images:<br>
@@ -189,12 +181,16 @@ We found a lot of literature about depth estimation. Intuitively, most of it inv
   <table>
     <tr valign="top">
       <td >
-        <img src="images/method/og.png" width="320px" />
-        <figcaption >i_1, blurred with standard deviation 1</figcaption>
+        <img src="images/method/flower.png" width="200px" />
+        <figcaption >Original photo</figcaption>
       </td>
       <td >
-        <img src="images/method/blurry.png" width="320px" />
-        <figcaption >i_2, blurred with standard deviation 2</figcaption>
+        <img src="images/method/og.png" width="200px" />
+        <figcaption >i_1, grayed and blurred with &sigma; = 1</figcaption>
+      </td>
+      <td >
+        <img src="images/method/blurry.png" width="200px" />
+        <figcaption >i_2, grayed and blurred with &sigma; = 1.5</figcaption>
       </td>
     <tr>
     </table>
@@ -531,13 +527,81 @@ Now, the variable full contains d, the full depth map.
   Your browser does not support the video tag.
 </video>
 <p>This is me going over the results we got so far in a more approachable format.</p>
-<h3>Next Steps</h3>
+<h2>Limitations</h2>
+<h3>Objects in Front of the plane of focus</h3>
 <p>
-    Our next steps are to follow through with the Defocus map estimation method
-    and finish interpolating from the sparse defocus map we have to a full
-    defocus map using laplacian matting. We will also have to implement the thin
-    lens model that we can use on the depth map once we have our completed depth map.
+  Since we estimate depth with how much region is out of focus, objects out of
+  focus in front of the plane of focus are estimated to have great depth - there
+  is an implicit assumption that everything in the scene is behind the plane of
+  focus and there is no way to distinguish if something is in front of or
+  behind the plane of focus.
 </p>
+<div>
+<table>
+  <tr valign="top">
+    <td >
+      <img src="images/limitations/photo1.jpeg" width="400px" />
+      <figcaption >Original Photo</figcaption>
+    </td>
+    <td >
+      <img src="images/limitations/iphoto1.png" width="400px" />
+      <figcaption >Defocus Map</figcaption>
+    </td>
+  </tr>
+</table>
+</div>
+<p>
+  Here the petal at the bottom left is estimated to be the the closest part of
+  the scene to the camera, although from the photo it is clear that this is not
+  true. This is because the plane of focus is on that petal, and petals closer to the
+  camera are rendered out of focus, and estimated to be further in the scene.
+</p>
+<h3>Color Correlation</h3>
+<p>
+  The depth of an object in the scene should be independent of what color it is.
+  However defocus estimation ends up being affected by the colors anyway. The
+  distribution of color around the image appears to affect the gradients of the
+  image.
+</p>
+<div>
+<table>
+  <tr valign="top">
+    <td >
+      <img src="images/limitations/camera.png" width="400px" />
+      <figcaption >Original Photo</figcaption>
+    </td>
+    <td >
+      <img src="images/limitations/icamera.png" width="400px" />
+      <figcaption >Defocus Map</figcaption>
+    </td>
+  </tr>
+</table>
+</div>
+<p>
+  In this example the silver lens is estimated to be very close to the camera
+  due to the strong gradient given by the silver to black edge.
+</p>
+<div>
+<table>
+  <tr valign="top">
+    <td >
+      <img src="images/limitations/yqsmall.png" width="400px" />
+      <figcaption >Original Photo</figcaption>
+    </td>
+    <td >
+      <img src="images/limitations/iyq.png" width="400px" />
+      <figcaption >Defocus Map</figcaption>
+    </td>
+  </tr>
+</table>
+<p>
+  Again, there is a correlation between color and depth. It is a little more difficult
+  to intepret what is going on in this portrait of our friend Yongqi. Focusing
+  on just his face, we can see that even his face is not evenly depth mapped,
+  especially across regions where the lighting falls. Part of this can also be
+  attributed to the numerical instability in dividing gradients.
+</p>
+</div>
 
 <h2>References</h2>
 <ol>
